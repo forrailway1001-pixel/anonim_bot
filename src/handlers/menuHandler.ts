@@ -11,6 +11,13 @@ export const handleMenuText = async (ctx: BotContext) => {
   const user = ctx.user;
   if (!user) return;
 
+  const formatDate = (date?: Date) => {
+    if (!date) return '';
+    const d = String(date.getDate()).padStart(2, '0');
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    return `${d}/${m}/${date.getFullYear()}`;
+  };
+
   switch (text) {
     case '🏠 Asosiy':
       return ctx.reply('Asosiy menyuga xush kelibsiz!');
@@ -27,13 +34,7 @@ export const handleMenuText = async (ctx: BotContext) => {
       return ctx.reply(`Sizda hozir 💡 *${user.ball} Ball* mavjud.`, { parse_mode: 'Markdown' });
       
     case '💎 Premium':
-      const formatExpiration = (date?: Date) => {
-        if (!date) return '';
-        const d = String(date.getDate()).padStart(2, '0');
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        return `${d}/${m}/${date.getFullYear()}`;
-      };
-      const status = user.premium ? `✅ Faol (Tugash vaqti: ${formatExpiration(user.premiumExpiration)})` : '❌ Faol emas';
+      const status = user.premium ? `✅ Faol (Tugash vaqti: ${formatDate(user.premiumExpiration)})` : '❌ Faol emas';
       return ctx.reply(`*Premium Holati:* ${status}\n\nPremium Afzalliklari:\n- Anonim xabar yuboruvchining kimligini ko'rish\n- Maxsus belgilar\n\nTarifni tanlang:`, {
         parse_mode: 'Markdown',
         reply_markup: buildPremiumMenu().reply_markup
@@ -65,6 +66,6 @@ export const handleMenuText = async (ctx: BotContext) => {
       return ctx.reply(`🎉 Siz kunlik bonus sifatida 💡 ${CONSTANTS.DAILY_BONUS_AMOUNT} Ball oldingiz!`);
       
     case '📊 Statistika':
-      return ctx.reply(`*Sizning Statistikangiz*\n\nQabul qilingan xabarlar: ${user.statistics.messagesReceived}\nProfilga tashriflar: ${user.statistics.visitors}\nRo'yxatdan o'tgan sana: ${user.registrationDate.toLocaleDateString()}`, { parse_mode: 'Markdown' });
+      return ctx.reply(`*Sizning Statistikangiz*\n\nQabul qilingan xabarlar: ${user.statistics.messagesReceived}\nProfilga tashriflar: ${user.statistics.visitors}\nRo'yxatdan o'tgan sana: ${formatDate(user.registrationDate)}`, { parse_mode: 'Markdown' });
   }
 };

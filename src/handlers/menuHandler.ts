@@ -27,7 +27,13 @@ export const handleMenuText = async (ctx: BotContext) => {
       return ctx.reply(`Sizda hozir 💡 *${user.ball} Ball* mavjud.`, { parse_mode: 'Markdown' });
       
     case '💎 Premium':
-      const status = user.premium ? `✅ Faol (Tugash vaqti: ${user.premiumExpiration?.toLocaleDateString()})` : '❌ Faol emas';
+      const formatExpiration = (date?: Date) => {
+        if (!date) return '';
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        return `${d}/${m}/${date.getFullYear()}`;
+      };
+      const status = user.premium ? `✅ Faol (Tugash vaqti: ${formatExpiration(user.premiumExpiration)})` : '❌ Faol emas';
       return ctx.reply(`*Premium Holati:* ${status}\n\nPremium Afzalliklari:\n- Anonim xabar yuboruvchining kimligini ko'rish\n- Maxsus belgilar\n\nTarifni tanlang:`, {
         parse_mode: 'Markdown',
         reply_markup: buildPremiumMenu().reply_markup

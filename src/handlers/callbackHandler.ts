@@ -27,7 +27,10 @@ export const callbackHandler = async (ctx: BotContext & { session?: any }) => {
     }
 
     // Purchase Premium
-    const expiration = new Date();
+    let expiration = new Date();
+    if (user.premium && user.premiumExpiration && user.premiumExpiration > expiration) {
+      expiration = new Date(user.premiumExpiration);
+    }
     expiration.setDate(expiration.getDate() + plan.days);
     
     await userRepository.addBall(user.telegramId, -plan.price, `Premium sotib olindi (${days} kun)`);

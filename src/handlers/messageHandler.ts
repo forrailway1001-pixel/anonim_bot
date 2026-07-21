@@ -1,0 +1,67 @@
+import { BotContext } from '../types';
+import { userRepository } from '../repositories/UserRepository';
+import { MessageLogModel } from '../models/MessageLog';
+import { buildAnonymousReplyMenu } from '../menus/keyboards';
+import { escapeMarkdownV2 } from '../utils/helpers';
+import { config } from '../config';
+
+export const messageHandler = async (ctx: BotContext & { session?: any }) => {
+  const user = ctx.user;
+  if (!user) return;
+
+  // Handle anonymous message sending
+  if (ctx.session?.anonymousReceiverId) {
+    const receiverId = ctx.session.anonymousReceiverId;
+    
+    try {
+      const receiver = await userRepository.findByTelegramId(receiverId);
+      if (!receiver) return ctx.reply('Foydalanuvchi topilmadi.');
+
+      let senderInfo = '🕵️ *Anonim*';
+      if (user.premium) {
+        senderInfo = `💎 *Premium Foydalanuvchi*\nIsmi: ${escapeMarkdownV2(user.fullName)}\nUsername: ${user.username ? '@' + user.username : 'Yo\'q'}\nID: \`${user.telegramId}\``;
+      }
+
+      const caption = `${senderInfo}\n\n`;
+      let sentMessage;
+
+      // Determine message type and copy it to receiver
+      if (ctx.message && 'text' in ctx.message) {
+        sentMessage = await ctx.telegram.sendMessage(receiverId, `${caption}${escapeMarkdownV2(ctx.message.text)}`, {
+          parse_mode: 'MarkdownV2',
+          reply_markup: buildAnonymousReplyMenu(user.telegramId).reply_markup,
+        });
+      } else if (ctx.message) {
+         // Copy other media types
+         sentMessage = await ctx.copyMessage(receiverId, {
+           reply_markup: buildAnonymousReplyMenu(user.telegramId).reply_markup
+         });
+         await ctx.telegram.sendMessage(receiverId, senderInfo, { parse_mode: 'MarkdownV2', reply_parameters: { message_id: sentMessage.message_id } });
+      }
+
+      // Log message
+      await MessageLogModel.create({
+        senderId: user.premium ? user.telegramId : undefined,
+        receiverId,
+        messageType: ctx.message && 'text' in ctx.message ? 'text' : 'media',
+      });
+
+      await userRepository.incrementMessagesReceived(receiverId);
+
+      // Send to Super Admin
+      if (config.SUPER_ADMIN_ID) {
+         await ctx.forwardMessage(config.SUPER_ADMIN_ID);
+         await ctx.telegram.sendMessage(config.SUPER_ADMIN_ID, `👆 ${user.telegramId} dan ${receiverId} ga anonim xabar`);
+      }
+
+      ctx.session.anonymousReceiverId = null; // Clear session
+      return ctx.reply('✅ Xabaringiz muvaffaqiyatli yuborildi!');
+
+    } catch (error) {
+      return ctx.reply('❌ Xabar yuborishda xatolik yuz berdi. Balki bu foydalanuvchi botni bloklagandir.');
+    }
+  }
+
+  // Not writing an anonymous message, fallback to default behavior
+  return ctx.reply('Iltimos, menyudan foydalaning yoki yaroqli anonim link yuboring.');
+};

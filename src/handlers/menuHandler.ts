@@ -57,8 +57,10 @@ export const handleMenuText = async (ctx: BotContext) => {
     case '🎁 Kunlik Bonus':
       const now = new Date();
       if (user.dailyBonusTime && now.getTime() - user.dailyBonusTime.getTime() < CONSTANTS.DAILY_BONUS_COOLDOWN_MS) {
-        const remaining = Math.ceil((CONSTANTS.DAILY_BONUS_COOLDOWN_MS - (now.getTime() - user.dailyBonusTime.getTime())) / (1000 * 60 * 60));
-        return ctx.reply(`Siz bugungi bonusni olib bo'lgansiz. ${remaining} soatdan so'ng qayta urinib ko'ring!`);
+        const remainingMs = CONSTANTS.DAILY_BONUS_COOLDOWN_MS - (now.getTime() - user.dailyBonusTime.getTime());
+        const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+        const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+        return ctx.reply(`Siz bugungi bonusni olib bo'lgansiz. ${remainingHours} soat ${remainingMinutes} daqiqadan so'ng qayta urinib ko'ring!`);
       }
       
       await userRepository.addBall(user.telegramId, CONSTANTS.DAILY_BONUS_AMOUNT, 'Kunlik Bonus');

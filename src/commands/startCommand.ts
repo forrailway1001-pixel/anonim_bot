@@ -40,7 +40,7 @@ export const startCommand = async (ctx: BotContext) => {
          await userRepository.incrementVisitors(receiver.telegramId);
       }
 
-      return ctx.reply(`Siz hozir ${escapeMarkdownV2(receiver.fullName)} ga anonim xabar yozyapsiz.\n\nIstalgan matn, rasm, video yoki ovozli xabar yuborishingiz mumkin!`, { parse_mode: 'MarkdownV2' });
+      return ctx.reply(`Siz hozir ${receiver.fullName} ga anonim xabar yozyapsiz.\n\nIstalgan matn, rasm, video yoki ovozli xabar yuborishingiz mumkin!`);
     }
   }
 

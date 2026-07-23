@@ -76,7 +76,7 @@ export const callbackHandler = async (ctx: BotContext & { session?: any }) => {
                ).catch(() => {});
                await userRepository.incrementVisitors(receiver.telegramId);
             }
-            return ctx.editMessageText(`✅ Tasdiqlandi! Endi botdan to\'liq foydalanishingiz mumkin.\n\nSiz hozir ${escapeMarkdownV2(receiver.fullName)} ga anonim xabar yozyapsiz.\n\nIstalgan matn, rasm, video yoki ovozli xabar yuborishingiz mumkin!`, { parse_mode: 'MarkdownV2' });
+            return ctx.editMessageText(`✅ Tasdiqlandi! Endi botdan to\'liq foydalanishingiz mumkin.\n\nSiz hozir ${receiver.fullName} ga anonim xabar yozyapsiz.\n\nIstalgan matn, rasm, video yoki ovozli xabar yuborishingiz mumkin!`);
          }
       }
       

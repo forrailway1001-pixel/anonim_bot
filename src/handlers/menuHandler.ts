@@ -46,14 +46,7 @@ export const handleMenuText = async (ctx: BotContext) => {
         reply_markup: buildReferralShareMenu(config.BOT_USERNAME, user.referralCode).reply_markup
       });
       
-    case '🏆 Reyting':
-      const topUsers = await userRepository.getTopUsersByReferrals(10);
-      let board = '*🏆 Top 10 Referallar*\n\n';
-      topUsers.forEach((u, i) => {
-         board += `${i + 1}. ${u.fullName} - ${u.referralCount} ta\n`;
-      });
-      return ctx.reply(board, { parse_mode: 'Markdown' });
-      
+
     case '🎁 Kunlik Bonus':
       const now = new Date();
       if (user.dailyBonusTime && now.getTime() - user.dailyBonusTime.getTime() < CONSTANTS.DAILY_BONUS_COOLDOWN_MS) {

@@ -72,7 +72,7 @@ export const callbackHandler = async (ctx: BotContext & { session?: any }) => {
             if (receiver.settings.notifications) {
                ctx.telegram.sendMessage(
                  receiver.telegramId,
-                 `👀 Kimdir sizning anonim sahifangizga kirdi.\nSana: ${new Date().toLocaleString()}`
+                 `👀 Kimdir sizning anonim sahifangizga kirdi.\nSana: ${new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' })}`
                ).catch(() => {});
                await userRepository.incrementVisitors(receiver.telegramId);
             }

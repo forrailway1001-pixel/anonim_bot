@@ -13,7 +13,7 @@ export const MENUS = {
   MAIN_MENU: [
     ['🏠 Asosiy', '🔗 Mening Referalim'],
     ['💡 Mening Ballarim', '💎 Premium'],
-    ['👥 Referal', '🏆 Reyting'],
+    ['👥 Referal'],
     ['🎁 Kunlik Bonus', '📊 Statistika']
   ],
   PREMIUM_MENU: [

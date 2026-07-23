@@ -62,6 +62,11 @@ export const messageHandler = async (ctx: BotContext & { session?: any }) => {
     }
   }
 
+  // If user used swipe-to-reply without setting session
+  if (ctx.message && 'reply_to_message' in ctx.message && ctx.message.reply_to_message) {
+    return ctx.reply('⚠️ Iltimos, xabarga javob berish uchun xabar ostidagi "↩️ Anonim javob berish" tugmasini bosing.');
+  }
+
   // Not writing an anonymous message, fallback to default behavior
   return ctx.reply('Iltimos, menyudan foydalaning yoki yaroqli anonim link yuboring.');
 };

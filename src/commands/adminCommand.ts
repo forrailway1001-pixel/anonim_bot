@@ -60,4 +60,27 @@ export const adminCommands = async (ctx: BotContext) => {
     const settings = await getSettings();
     return ctx.reply(`*Homiy Kanallar:*\n\n${settings.sponsorChannels.join('\n') || 'Kanallar yo\'q.'}`, { parse_mode: 'Markdown' });
   }
+
+  if (text.startsWith('/broadcast ')) {
+    const message = text.substring('/broadcast '.length);
+    if (!message.trim()) return ctx.reply('Foydalanish: /broadcast <xabar matni>');
+    
+    ctx.reply('Xabar yuborish boshlandi... Bu biroz vaqt olishi mumkin.');
+    const users = await userRepository.getAllUsers();
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const u of users) {
+      try {
+        await ctx.telegram.sendMessage(u.telegramId, message);
+        successCount++;
+        // Kichik pauza, telegram limitlariga tushmaslik uchun
+        await new Promise(r => setTimeout(r, 50));
+      } catch (err) {
+        failCount++;
+      }
+    }
+
+    return ctx.reply(`Broadcast yakunlandi!\n\nMuvaffaqiyatli: ${successCount}\nXatolik/Bloklaganlar: ${failCount}`);
+  }
 };

@@ -31,6 +31,10 @@ export class UserRepository {
     return UserModel.find().sort({ ball: -1 }).limit(limit);
   }
 
+  async getAllUsers(): Promise<UserDocument[]> {
+    return UserModel.find({});
+  }
+
   async incrementMessagesReceived(telegramId: number): Promise<void> {
     await UserModel.updateOne(
       { telegramId },

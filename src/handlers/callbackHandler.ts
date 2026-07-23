@@ -3,6 +3,7 @@ import { CONSTANTS } from '../constants';
 import { userRepository } from '../repositories/UserRepository';
 import { userService } from '../services/UserService';
 import { getSettings } from '../models/Settings';
+import { escapeMarkdownV2 } from '../utils/helpers';
 
 export const callbackHandler = async (ctx: BotContext & { session?: any }) => {
   if (!ctx.callbackQuery || !('data' in ctx.callbackQuery)) return;
@@ -64,6 +65,21 @@ export const callbackHandler = async (ctx: BotContext & { session?: any }) => {
       if (inviterId) {
         ctx.telegram.sendMessage(inviterId, '🎉 Siz taklif qilgan foydalanuvchi tasdiqdan o\'tdi! Siz 💡 50 Ball oldingiz.');
       }
+      
+      if (ctx.session && ctx.session.anonymousReceiverId) {
+         const receiver = await userRepository.findByTelegramId(ctx.session.anonymousReceiverId);
+         if (receiver) {
+            if (receiver.settings.notifications) {
+               ctx.telegram.sendMessage(
+                 receiver.telegramId,
+                 `👀 Kimdir sizning anonim sahifangizga kirdi.\nSana: ${new Date().toLocaleString()}`
+               ).catch(() => {});
+               await userRepository.incrementVisitors(receiver.telegramId);
+            }
+            return ctx.editMessageText(`✅ Tasdiqlandi! Endi botdan to\'liq foydalanishingiz mumkin.\n\nSiz hozir ${escapeMarkdownV2(receiver.fullName)} ga anonim xabar yozyapsiz.\n\nIstalgan matn, rasm, video yoki ovozli xabar yuborishingiz mumkin!`, { parse_mode: 'MarkdownV2' });
+         }
+      }
+      
       return ctx.editMessageText('✅ Tasdiqlandi! Endi botdan to\'liq foydalanishingiz mumkin.');
     } else {
       return ctx.reply(`❌ Siz barcha homiy kanallarga a'zo bo'lmadingiz.\n\nIltimos, quyidagilarga a'zo bo'ling: ${notJoined.join(', ')}`);

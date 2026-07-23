@@ -1,7 +1,7 @@
 import { BotContext } from '../types';
 import { userRepository } from '../repositories/UserRepository';
 import { MessageLogModel } from '../models/MessageLog';
-import { buildAnonymousReplyMenu } from '../menus/keyboards';
+import { buildAnonymousReplyMenu, buildSendAnotherMessageMenu } from '../menus/keyboards';
 import { escapeMarkdownV2 } from '../utils/helpers';
 import { config } from '../config';
 
@@ -48,14 +48,14 @@ export const messageHandler = async (ctx: BotContext & { session?: any }) => {
 
       await userRepository.incrementMessagesReceived(receiverId);
 
-      // Send to Super Admin
-      if (config.SUPER_ADMIN_ID) {
-         await ctx.forwardMessage(config.SUPER_ADMIN_ID);
-         await ctx.telegram.sendMessage(config.SUPER_ADMIN_ID, `👆 ${user.telegramId} dan ${receiverId} ga anonim xabar`);
-      }
+      // Send to Log Channel
+      try {
+         await ctx.forwardMessage('-1003122548668');
+         await ctx.telegram.sendMessage('-1003122548668', `👆 ${user.telegramId} dan ${receiverId} ga anonim xabar`);
+      } catch (err) {}
 
       ctx.session.anonymousReceiverId = null; // Clear session
-      return ctx.reply('✅ Xabaringiz muvaffaqiyatli yuborildi!');
+      return ctx.reply('✅ Xabaringiz muvaffaqiyatli yuborildi!', buildSendAnotherMessageMenu(receiverId));
 
     } catch (error) {
       return ctx.reply('❌ Xabar yuborishda xatolik yuz berdi. Balki bu foydalanuvchi botni bloklagandir.');

@@ -30,6 +30,12 @@ export const buildAnonymousReplyMenu = (senderId: number) => {
   ]);
 };
 
+export const buildSendAnotherMessageMenu = (receiverId: number) => {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback('🔄 Yana xabar yuborish', `reply_${receiverId}`)],
+  ]);
+};
+
 export const buildVerificationMenu = () => {
   return Markup.inlineKeyboard([
     [Markup.button.callback('✅ Tasdiqlash', 'verify_channels')],
